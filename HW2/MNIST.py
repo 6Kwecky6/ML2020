@@ -11,7 +11,7 @@ class RegressionModel(torch.nn.Module):
         self.b1 = torch.randn(1,10,requires_grad=True)
 
     def logits(self,x):
-        return x @ self.W1 + self.b1
+        return x @ self.W1 + self.b1 #Sigmoid her kanskje? Tør ikke å prøve rett før innlev
 
     def f(self, x):
         return torch.nn.functional.softmax(self.logits(x), dim=1)
@@ -65,19 +65,15 @@ def main():
     found = [False, False, False, False, False, False, False, False, False, False]
     count = 0
     while False in found:
-        for i in range(10):
-            print(y_test[i, count].item())
-            if y_test[i, count].item() == 1.:
-                print(y_test[count, i].item())
-                print(count)
-                if not found[i]:
-                    plt.imshow(x_train[count, :].reshape(28, 28))
-                    plt.imsave('x_train_%s.png' % i, x_train[count, :].reshape(28, 28))
+        y_found = model.f(x_test[count,:]) #Getting proposed classification
+        for i in range(10): #Searching throuch all classifications
+            if y_found[0,i].item() == 1.: #Finds the correct classification
+                if not found[i]: #Checks if already found one of those
+                    plt.imsave('x_test_%s.png' % i, x_test[count, :].reshape(28, 28)) #Creates an image of said picture
                     found[i] = True
                 else:
                     break
         count += 1
-
 
 if __name__ == '__main__':
     main()
